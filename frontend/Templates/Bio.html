@@ -16,10 +16,10 @@
     <div class="sidebar" id="sidebar">
         <div class="menu-icons">
             <div class="menu-icon hamburger"></div>
-            <div class="menu-icon gear"></div>
+            <a href="{{ url_for('feed') }}" class="menu-icon house" title="Descubrir proyectos"></a>
             <a href="{{ url_for('my_projects') }}" class="menu-icon layers" title="Mis proyectos"></a>
+            <a href="{{ url_for('member_projects') }}" class="menu-icon team" title="Proyectos miembro"></a>
             <div class="menu-icon user"></div>
-            <div class="menu-icon download"></div>
         </div>
         <label class="toggle-switch">
             <input type="checkbox" id="theme-toggle">
@@ -31,11 +31,10 @@
     <div class="mobile-header" id="mobile-header">
         <img src="/static/imagenes/logoTomberS.png" alt="Logo Tomber Sur" class="logo-img-mini">
         <div class="menu-icons">
-            <a href="{{ url_for('feed') }}" class="menu-icon house"></a>
-            <div class="menu-icon gear"></div>
+            <a href="{{ url_for('feed') }}" class="menu-icon house" title="Descubrir proyectos"></a>
             <a href="{{ url_for('my_projects') }}" class="menu-icon layers" title="Mis proyectos"></a>
+            <a href="{{ url_for('member_projects') }}" class="menu-icon team" title="Proyectos miembro"></a>
             <div class="menu-icon user"></div>
-            <div class="menu-icon download"></div>
         </div>
         <label class="toggle-switch">
             <input type="checkbox" id="theme-togglemo">

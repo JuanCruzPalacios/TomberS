@@ -30,6 +30,12 @@ def my_projects():
     return render_template("my_projects.html")
 
 
+@app.route("/proyectos-miembro")
+def member_projects():
+    """Renderiza la vista de proyectos en los que el usuario es miembro."""
+    return render_template("member_projects.html")
+
+
 @app.route("/mis-proyectos/<int:project_id>/interesados")
 def project_interested(project_id: int):
     """Renderiza la lista de interesados para un proyecto determinado."""

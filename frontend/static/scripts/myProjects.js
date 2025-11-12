@@ -173,7 +173,48 @@
 
             updateExpandedCard(project) {
                 super.updateExpandedCard(project);
+                this.alignExpandedMarkupToFeed();
                 this.updateOwnerButtons(project);
+            }
+
+            alignExpandedMarkupToFeed() {
+                const root = this.expandedCard;
+                if (!root) return;
+
+                // 1) Alinear etiqueta del 4to stat a "Tipo"
+                try {
+                    const statLabels = root.querySelectorAll('.expanded-stats-grid .stat-item .stat-content .stat-label');
+                    if (statLabels && statLabels.length >= 4) {
+                        statLabels[3].textContent = 'Tipo';
+                    }
+                } catch (_) {}
+
+                // 2) Alinear contenedor de progreso a la estructura del feed
+                try {
+                    const progressSection = root.querySelector('.progress-section');
+                    if (progressSection) {
+                        progressSection.classList.add('expanded-progress');
+                        if (!progressSection.querySelector('.progress-label')) {
+                            const label = document.createElement('div');
+                            label.className = 'progress-label';
+                            label.textContent = 'Avance del proyecto';
+                            progressSection.insertBefore(label, progressSection.firstChild);
+                        }
+                    }
+                } catch (_) {}
+
+                // 3) Alinear titulos de secciones al formato del feed
+                try {
+                    const sectionHeadings = root.querySelectorAll('.expanded-right .section > h3');
+                    sectionHeadings.forEach((h3) => {
+                        h3.classList.add('section-title');
+                        const text = (h3.textContent || '').trim().toLowerCase();
+                        if (text.includes('resumen')) h3.textContent = 'Descripción';
+                        if (text.includes('tecnolog')) h3.textContent = 'Tecnologías';
+                        if (text.includes('objetivo')) h3.textContent = 'Objetivos';
+                        if (text.includes('habilidad')) h3.textContent = 'Aptitudes requeridas';
+                    });
+                } catch (_) {}
             }
 
             updateOwnerButtons(project) {

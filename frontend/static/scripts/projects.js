@@ -28,7 +28,7 @@ class ProjectsManager {
         this.viewedProjects = new Set();
         this.interactedProjectIds = new Set();
         this.includeInteracted = this.options.includeInteracted ?? false;
-        if (this.mode === 'my-projects') {
+        if (this.mode === 'my-projects' || this.mode === 'member-projects') {
             this.includeInteracted = true;
         }
         this.searchQuery = '';
@@ -199,6 +199,18 @@ class ProjectsManager {
         const numericCreatorId = Number(project.creatorId);
         const resolvedCreatorId = Number.isFinite(numericCreatorId) ? numericCreatorId : (project.creatorId ?? null);
         const isOwner = this.isProjectOwnedByCurrentUser(resolvedProjectId, resolvedCreatorId);
+        const currentUserId = this.currentUserId;
+        let isMember = Boolean(isOwner);
+        if (!isMember && currentUserId !== null && currentUserId !== undefined) {
+            const currentKey = String(currentUserId);
+            isMember = members.some((m) => {
+                const mid = m?.id;
+                if (mid === null || mid === undefined) {
+                    return false;
+                }
+                return String(mid) === currentKey;
+            });
+        }
 
         return {
             id: resolvedProjectId,
@@ -212,6 +224,7 @@ class ProjectsManager {
             members,
             creatorId: resolvedCreatorId,
             isOwner,
+            isMember,
             status: statusValue,
             repositoryUrl: project.repositoryUrl || null,
             contactEmail: project.contactEmail || null,
@@ -230,6 +243,8 @@ class ProjectsManager {
 
         if (this.mode === 'my-projects') {
             baseList = baseList.filter((project) => project?.isOwner);
+        } else if (this.mode === 'member-projects') {
+            baseList = baseList.filter((project) => project?.isMember);
         }
 
         this.allProjects = baseList;
@@ -318,12 +333,18 @@ class ProjectsManager {
     renderCurrentProject() {
         if (this.projects.length === 0) {
             if (this.masterProjects.length === 0) {
-                const emptyMessage = this.mode === 'my-projects'
-                    ? 'Todavia no creaste proyectos.'
-                    : 'Todavia no hay proyectos publicados. Crea el primero!';
-                const emptyDescription = this.mode === 'my-projects'
-                    ? 'Anda al feed y usa el boton "Crear proyecto" para publicar uno nuevo.'
-                    : 'Podes crear un proyecto nuevo con el boton "Crear proyecto".';
+                let emptyMessage;
+                let emptyDescription;
+                if (this.mode === 'my-projects') {
+                    emptyMessage = 'Todavia no creaste proyectos.';
+                    emptyDescription = 'Anda al feed y usa el boton "Crear proyecto" para publicar uno nuevo.';
+                } else if (this.mode === 'member-projects') {
+                    emptyMessage = 'Todavia no sos miembro de ningun proyecto.';
+                    emptyDescription = 'Unite a proyectos desde el feed para verlos aca.';
+                } else {
+                    emptyMessage = 'Todavia no hay proyectos publicados. Crea el primero!';
+                    emptyDescription = 'Podes crear un proyecto nuevo con el boton "Crear proyecto".';
+                }
                 this.showNoProjectsMessage(emptyMessage, emptyDescription);
             } else {
                 this.showAllProjectsViewedMessage();
@@ -764,7 +785,7 @@ class ProjectsManager {
             return;
         }
 
-        if (this.mode === 'my-projects') {
+        if (this.mode === 'my-projects' || this.mode === 'member-projects') {
             if (direction === 'right') {
                 this.nextProject();
             } else if (direction === 'left') {
@@ -830,9 +851,16 @@ class ProjectsManager {
             return;
         }
 
-        const resolvedDescription = description ?? (this.mode === 'my-projects'
-            ? 'Anda al feed y crea un proyecto para verlo aca.'
-            : 'Podes crear un proyecto nuevo con el boton "Crear proyecto".');
+        let resolvedDescription = description;
+        if (resolvedDescription == null) {
+            if (this.mode === 'my-projects') {
+                resolvedDescription = 'Anda al feed y crea un proyecto para verlo aca.';
+            } else if (this.mode === 'member-projects') {
+                resolvedDescription = 'Unite a un proyecto desde el feed para verlo aca.';
+            } else {
+                resolvedDescription = 'Podes crear un proyecto nuevo con el boton "Crear proyecto".';
+            }
+        }
 
         this.cardContainer.innerHTML = `
             <div class="empty-state">
@@ -851,12 +879,18 @@ class ProjectsManager {
             return;
         }
 
-        const heading = this.mode === 'my-projects'
-            ? 'Ya recorriste todos tus proyectos'
-            : 'Ya revisaste todos los proyectos';
-        const description = this.mode === 'my-projects'
-            ? 'Volve al feed para crear uno nuevo o usa el boton "Editar" para actualizar los existentes.'
-            : 'Crea tu propio proyecto o espera otros nuevos.';
+        let heading;
+        let description;
+        if (this.mode === 'my-projects') {
+            heading = 'Ya recorriste todos tus proyectos';
+            description = 'Volve al feed para crear uno nuevo o usa el boton "Editar" para actualizar los existentes.';
+        } else if (this.mode === 'member-projects') {
+            heading = 'Ya revisaste todos los proyectos donde sos miembro';
+            description = 'Volve al feed para descubrir mas proyectos y sumarte a otros nuevos.';
+        } else {
+            heading = 'Ya revisaste todos los proyectos';
+            description = 'Crea tu propio proyecto o espera otros nuevos.';
+        }
 
         this.cardContainer.innerHTML = `
             <div class="all-projects-viewed-message">

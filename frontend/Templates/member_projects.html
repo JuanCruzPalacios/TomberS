@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/styles/style.css">
+    <title>TomberS - Proyectos donde soy miembro</title>
+    <meta name="robots" content="noindex,nofollow">
+    <meta name="description" content="Proyectos en los que soy miembro">
+    <meta name="theme-color" content="#613A67">
+    <link rel="icon" href="/static/imagenes/logoTomberS.png">
+    <link rel="apple-touch-icon" href="/static/imagenes/logoTomberS.png">
+    <meta name="apple-mobile-web-app-title" content="TomberS">
+    <meta name="application-name" content="TomberS">
+    <meta name="color-scheme" content="dark light">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="HandheldFriendly" content="true">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body class="page-view" data-view-mode="member-projects">
+    <div class="logo-container">
+        <img src="/static/imagenes/logoTomberS.png" alt="Logo Tomber Sur" class="logo-img">
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="menu-icons">
+            <div class="menu-icon hamburger"></div>
+            <a href="{{ url_for('feed') }}" class="menu-icon house" title="Descubrir proyectos"></a>
+            <a href="{{ url_for('my_projects') }}" class="menu-icon layers" title="Mis proyectos"></a>
+            <a href="{{ url_for('member_projects') }}" class="menu-icon team active" title="Proyectos miembro"></a>
+            <a href="{{ url_for('bio') }}" class="menu-icon user" title="Mi perfil"></a>
+        </div>
+        <label class="toggle-switch">
+            <input type="checkbox" id="theme-toggle">
+            <span class="slider"></span>
+        </label>
+    </div>
+    <div class="sidebar-trigger" id="sidebar-trigger"></div>
+
+    <div class="mobile-header" id="mobile-header">
+        <img src="/static/imagenes/logoTomberS.png" alt="Logo Tomber Sur" class="logo-img-mini">
+        <div class="menu-icons">
+            <a href="{{ url_for('feed') }}" class="menu-icon house" title="Descubrir proyectos"></a>
+            <a href="{{ url_for('my_projects') }}" class="menu-icon layers" title="Mis proyectos"></a>
+            <a href="{{ url_for('member_projects') }}" class="menu-icon team active" title="Proyectos miembro"></a>
+            <a href="{{ url_for('bio') }}" class="menu-icon user" title="Mi perfil"></a>
+        </div>
+        <label class="toggle-switch">
+            <input type="checkbox" id="theme-togglemo">
+            <span class="slider"></span>
+        </label>
+    </div>
+
+    <div class="card-container">
+        <div class="project-card" id="project-card">
+            <div class="card-title-row">
+                <h2 class="card-title">Selecciona un proyecto</h2>
+            </div>
+            <div class="card-image"></div>
+            <div class="card-stats">
+                <span><span class="fluent--people-team-16-filled iconos"></span><span class="stats-text">00/00</span></span>
+                <span><span class="tabler--clock iconos"></span><span class="stats-text">Sin definir</span></span>
+                <span><span class="material-symbols--translate iconos"></span><span class="stats-text">Idioma</span></span>
+                <span><span class="mdi--tools iconos"></span><span class="stats-text">Tipo</span></span>
+            </div>
+            <div class="card-description">
+                Deslizá para navegar entre proyectos donde ya sos miembro. Desplazá hacia arriba para ver los detalles.
+            </div>
+            <div class="card-tech">
+                <div class="tech-icon">UX</div>
+                <div class="tech-icon">API</div>
+                <div class="tech-icon">Data</div>
+                <div class="tech-icon">QA</div>
+            </div>
+            <div class="actions">
+                <svg class="rotate-icon" viewBox="0 0 24 24">
+                    <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" fill="currentColor"/>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <div class="status-indicators" id="status-indicators">
+        <div class="dislike-indicator">Anterior</div>
+        <div class="ampliar-indicator">Ver más</div>
+        <div class="like-indicator">Siguiente</div>
+    </div>
+
+    <div class="expanded-card hidden" id="expanded-card">
+        <button class="close-expanded" id="close-expanded">&times;</button>
+        <div class="expanded-content">
+            <div class="expanded-header">
+                <h2 class="expanded-title">Nombre del proyecto</h2>
+                <div class="expanded-status">
+                    <span class="status-badge active">Activo</span>
+                </div>
+            </div>
+
+            <div class="expanded-main">
+                <div class="expanded-left">
+                    <div class="expanded-image">
+                        <img src="/static/imagenes/coding-foto-ejemplo.jpg" alt="Vista previa del proyecto">
+                        <div class="image-overlay">
+                            <span class="view-badge">Vista previa</span>
+                        </div>
+                    </div>
+
+                    <div class="expanded-stats-grid">
+                        <div class="stat-item">
+                            <span class="fluent--people-team-16-filled"></span>
+                            <div class="stat-content">
+                                <span class="stat-label">Equipo</span>
+                                <span class="stat-value">00/00</span>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <span class="tabler--clock"></span>
+                            <div class="stat-content">
+                                <span class="stat-label">Duración</span>
+                                <span class="stat-value">Sin definir</span>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <span class="material-symbols--translate"></span>
+                            <div class="stat-content">
+                                <span class="stat-label">Idioma</span>
+                                <span class="stat-value">Español</span>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <span class="mdi--tools"></span>
+                            <div class="stat-content">
+                                <span class="stat-label">Tipo</span>
+                                <span class="stat-value">General</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="expanded-progress">
+                        <div class="progress-label">Avance del proyecto</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%"></div>
+                        </div>
+                        <span class="progress-text">0% completado</span>
+                    </div>
+                </div>
+
+                <div class="expanded-right">
+                    <div class="section">
+                        <h3 class="section-title">Descripción</h3>
+                        <p class="section-content">La información completa del proyecto se mostrará acá cuando selecciones una propuesta de la lista.</p>
+                    </div>
+                    <div class="section">
+                        <h3 class="section-title">Integrantes</h3>
+                        <div class="members-list"></div>
+                    </div>
+                    <div class="section">
+                        <h3 class="section-title">Tecnologías</h3>
+                        <div class="tech-grid"></div>
+                    </div>
+                    <div class="section">
+                        <h3 class="section-title">Objetivos</h3>
+                        <div class="objectives-list"></div>
+                    </div>
+                    <div class="section">
+                        <h3 class="section-title">Aptitudes requeridas</h3>
+                        <div class="skills-grid"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="expanded-footer">
+                <div class="footer-actions">
+                    <button class="action-btn secondary" data-action="repository">Ver repositorio</button>
+                    <button class="action-btn tertiary" data-action="contact">Contactar equipo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/scripts/apiClient.js"></script>
+    <script src="/static/scripts/uiCommon.js"></script>
+    <script src="/static/scripts/script.js"></script>
+    <script src="/static/scripts/projects.js"></script>
+</body>
+</html>
