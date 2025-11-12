@@ -370,6 +370,7 @@ class ProjectsManager {
      */
     updateProjectCard(project) {
         const title = this.projectCard?.querySelector('.card-title');
+        const titleRow = this.projectCard?.querySelector('.card-title-row');
         const description = this.projectCard?.querySelector('.card-description');
         const image = this.projectCard?.querySelector('.card-image');
         const statsText = this.projectCard?.querySelectorAll('.stats-text');
@@ -377,6 +378,20 @@ class ProjectsManager {
 
         if (title) {
             title.textContent = project.title;
+        }
+        // Indicador de creador en la tarjeta principal
+        if (titleRow) {
+            let badge = titleRow.querySelector('.owner-badge');
+            if (project.isOwner) {
+                if (!badge) {
+                    badge = document.createElement('span');
+                    badge.className = 'owner-badge';
+                    badge.textContent = 'Creador';
+                    titleRow.appendChild(badge);
+                }
+            } else if (badge) {
+                badge.remove();
+            }
         }
         if (description) {
             description.textContent = project.description;

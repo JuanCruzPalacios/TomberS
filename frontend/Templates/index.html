@@ -10,7 +10,9 @@
     <!-- Encabezado con logo y selector de tema -->
     <div class="auth-header">
         <div class="logo-container">
-            <img src="/static/imagenes/logoTomberS.png" alt="Logo Tomber Sur" class="logo-img">
+            <a href="{{ url_for('index') }}">
+                <img src="/static/imagenes/logoTomberS.png" alt="Logo Tomber Sur" class="logo-img">
+            </a>
         </div>
         <label class="toggle-switch">
             <input type="checkbox" id="theme-toggle">

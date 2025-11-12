@@ -8,7 +8,9 @@
 </head>
 <body style="justify-content: center; align-items: center;">
     <div class="logo-container">
-        <img src="/static/imagenes/logoTomberS.png" alt="Logo Tomber Sur" class="logo-img">
+        <a href="{{ url_for('feed') }}">
+            <img src="/static/imagenes/logoTomberS.png" alt="Logo Tomber Sur" class="logo-img">
+        </a>
     </div>
 
     <div class="sidebar" id="sidebar">
@@ -27,7 +29,9 @@
     <div class="sidebar-trigger" id="sidebar-trigger"></div>
 
     <div class="mobile-header" id="mobile-header">
-        <img src="/static/imagenes/logoTomberS.png" alt="Logo Tomber Sur" class="logo-img-mini">
+        <a href="{{ url_for('feed') }}">
+            <img src="/static/imagenes/logoTomberS.png" alt="Logo Tomber Sur" class="logo-img-mini">
+        </a>
         <div class="menu-icons">
             <a href="{{ url_for('feed') }}" class="menu-icon house" title="Descubrir proyectos"></a>
             <a href="{{ url_for('my_projects') }}" class="menu-icon layers" title="Mis proyectos"></a>

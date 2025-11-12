@@ -8,7 +8,9 @@
 </head>
 <body class="page-view" data-project-id="{{ project_id }}" data-project-title="{{ project_title or '' }}">
     <div class="logo-container">
-        <img src="/static/imagenes/logoTomberS.png" alt="Logo Tomber Sur" class="logo-img">
+        <a href="{{ url_for('feed') }}">
+            <img src="/static/imagenes/logoTomberS.png" alt="Logo Tomber Sur" class="logo-img">
+        </a>
     </div>
 
     <div class="sidebar" id="sidebar">
@@ -27,7 +29,9 @@
     <div class="sidebar-trigger" id="sidebar-trigger"></div>
 
     <div class="mobile-header" id="mobile-header">
-        <img src="/static/imagenes/logoTomberS.png" alt="Logo Tomber Sur" class="logo-img-mini">
+        <a href="{{ url_for('feed') }}">
+            <img src="/static/imagenes/logoTomberS.png" alt="Logo Tomber Sur" class="logo-img-mini">
+        </a>
         <div class="menu-icons">
             <a href="{{ url_for('feed') }}" class="menu-icon house" title="Descubrir proyectos"></a>
             <a href="{{ url_for('my_projects') }}" class="menu-icon layers" title="Mis proyectos"></a>
@@ -41,9 +45,10 @@
     </div>
 
     <main class="my-projects-layout" role="main">
-        <section class="view-intro hero-block" aria-labelledby="hero-heading">
+        <section class="view-intro hero-block collapsible collapsed" aria-labelledby="hero-heading">
             <span class="hero-eyebrow">Gestión de talento</span>
             <h1 id="hero-heading">Personas interesadas</h1>
+            <button type="button" class="hero-toggle" title="Expandir/Minimizar" aria-label="Expandir o minimizar">▾</button>
             <p class="hero-description">Evalúa cada postulación y responde rápido para mantener el entusiasmo del equipo.</p>
 
             <div class="hero-summary" aria-label="Resumen de postulaciones">

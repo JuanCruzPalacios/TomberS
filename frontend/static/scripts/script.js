@@ -135,6 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             expandedCard.classList.add('hidden');
             expandedView = false;
+            document.body.classList.remove('hide-hero');
         }, 300);
     });
 
@@ -323,6 +324,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 expandedCard?.classList.add('visible');
                 expandedView = true;
                 resetCardPosition(false);
+                document.body.classList.add('hide-hero');
             }, 300);
             handleSwipe('up');
         } else {

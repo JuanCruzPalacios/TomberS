@@ -1342,6 +1342,21 @@ body.dark-mode .like-indicator , body.dark-mode .dislike-indicator {
     transform: translateY(-2px);
 }
 
+/* Indicador de creador en tarjetas */
+.owner-badge {
+    display: inline-block;
+    margin-left: 10px;
+    padding: 4px 8px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #C27BFF, #9f4fff);
+    border: 1px solid rgba(255,255,255,0.2);
+    letter-spacing: 0.3px;
+    vertical-align: middle;
+}
+
 /* Transición suave de aparición */
 .expanded-card {
     display: none;
@@ -2335,6 +2350,51 @@ body {
     align-items: stretch;
 }
 
+/* Collapsible variant for hero banner to avoid pushing card */
+.hero-block.collapsible {
+    position: relative;
+    padding: 8px 12px;
+}
+
+.hero-block.collapsible .hero-toggle {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1px solid rgba(97,58,103,0.3);
+    background: rgba(97,58,103,0.12);
+    color: #1f1b2e;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    line-height: 1;
+}
+
+.hero-block.collapsible .hero-toggle:hover {
+    background: rgba(97,58,103,0.2);
+}
+
+.hero-block.collapsed .hero-description,
+.hero-block.collapsed .hero-summary,
+.hero-block.collapsed .hero-actions {
+    display: none !important;
+}
+
+.hero-block.collapsed h1 {
+    margin-right: 40px; /* space for toggle */
+}
+
+@media (max-width: 480px) {
+    .hero-block.collapsible {
+        padding: 8px 12px;
+        border-radius: 14px;
+    }
+}
+
 .hero-block h1 {
     font-size: clamp(1.4rem, 2vw, 1.8rem);
     font-weight: 600;
@@ -2741,13 +2801,121 @@ body.page-view.dark-mode .hero-button.secondary {
     margin-top: 12px;
 }
 
-.my-projects-layout .card-container {
-    width: 100%;
+.my-projects-layout {
     position: relative;
-    min-height: 440px;
+}
+
+.my-projects-layout .card-container {
+    /* Igual que el feed, pero sin depender de % de altura del contenedor */
     display: flex;
+    position: relative;
+    width: 90%;
+    max-width: 400px;
+    height: clamp(440px, 80vh, 530px);
+    perspective: 1000px;
+    margin-top: var(--hero-card-offset, 10px);
+    margin-bottom: 20px;
+    z-index: 1002;
     justify-content: center;
     align-items: center;
+}
+
+/* El banner superior no empuja a la tarjeta: se superpone arriba */
+.my-projects-layout .hero-block.collapsible {
+    position: sticky;
+    top: 10px;
+    z-index: 1010;
+    overflow: hidden;
+    width: min(720px, 92vw);
+    max-width: min(720px, 92vw);
+    margin-left: auto;
+    margin-right: auto;
+    transition: max-height 0.32s cubic-bezier(.25,.8,.25,1), padding 0.22s ease, opacity 0.22s ease, transform 0.22s ease;
+    will-change: max-height, opacity, transform;
+    backdrop-filter: blur(2px);
+}
+
+.my-projects-layout .hero-block.collapsible:not(.collapsed) {
+    max-height: 180px;
+    opacity: 1;
+}
+
+.my-projects-layout .hero-block.collapsible.collapsed {
+    max-height: 40px;
+    opacity: 0.98;
+}
+
+/* Evita que se vea el título cuando el banner está minimizado */
+.hero-block.collapsible.collapsed h1 {
+    display: none !important;
+}
+
+/* Compact hero sizing for non member-projects views (my_projects, interested) */
+body.page-view:not([data-view-mode="member-projects"]) .hero-block.collapsible {
+    padding: 6px 10px;
+}
+
+body.page-view:not([data-view-mode="member-projects"]) .hero-block.collapsible h1 {
+    font-size: clamp(1.0rem, 1.8vw, 1.2rem);
+    line-height: 1.2;
+}
+
+body.page-view:not([data-view-mode="member-projects"]) .hero-block.collapsible .hero-description {
+    font-size: 0.72rem;
+    line-height: 1.25;
+}
+
+body.page-view:not([data-view-mode="member-projects"]) .hero-summary {
+    gap: 4px;
+    margin-top: 4px;
+}
+
+body.page-view:not([data-view-mode="member-projects"]) .hero-summary__item {
+    min-width: 100px;
+    padding: 4px 8px;
+}
+
+body.page-view:not([data-view-mode="member-projects"]) .hero-summary__label {
+    font-size: 0.55rem;
+}
+
+body.page-view:not([data-view-mode="member-projects"]) .hero-summary__value {
+    font-size: 0.78rem;
+}
+
+body.page-view:not([data-view-mode="member-projects"]) .hero-actions {
+    gap: 6px;
+    margin-top: 4px;
+}
+
+body.page-view:not([data-view-mode="member-projects"]) .hero-button {
+    padding: 4px 10px;
+    font-size: 0.72rem;
+}
+
+/* El espaciado entre banner y tarjeta vuelve al default (10px) */
+
+/* Al abrir la tarjeta expandida ocultamos el banner y anulamos el margen superior */
+body.hide-hero .my-projects-layout .hero-block.collapsible {
+    display: none !important;
+}
+
+body.hide-hero .my-projects-layout .card-container {
+    margin-top: 0 !important;
+}
+
+.hero-block.collapsible .hero-description,
+.hero-block.collapsible .hero-summary,
+.hero-block.collapsible .hero-actions {
+    transition: opacity 0.25s ease, max-height 0.35s ease;
+    overflow: hidden;
+}
+
+.hero-block.collapsible.collapsed .hero-description,
+.hero-block.collapsible.collapsed .hero-summary,
+.hero-block.collapsible.collapsed .hero-actions {
+    max-height: 0;
+    opacity: 0;
 }
 
 @media (max-width: 960px) {
@@ -2794,7 +2962,7 @@ body.page-view {
     align-items: center;
     justify-content: center;
     overflow-x: hidden;
-    overflow-y: hidden;
+    overflow-y: auto;
     padding: 24px 16px;
     background: #D4BDE8;
     color: #1f1b2e;

@@ -22,7 +22,9 @@
 </head>
 <body class="page-view" data-view-mode="member-projects">
     <div class="logo-container">
-        <img src="/static/imagenes/logoTomberS.png" alt="Logo Tomber Sur" class="logo-img">
+        <a href="{{ url_for('feed') }}">
+            <img src="/static/imagenes/logoTomberS.png" alt="Logo Tomber Sur" class="logo-img">
+        </a>
     </div>
 
     <div class="sidebar" id="sidebar">
@@ -41,7 +43,9 @@
     <div class="sidebar-trigger" id="sidebar-trigger"></div>
 
     <div class="mobile-header" id="mobile-header">
-        <img src="/static/imagenes/logoTomberS.png" alt="Logo Tomber Sur" class="logo-img-mini">
+        <a href="{{ url_for('feed') }}">
+            <img src="/static/imagenes/logoTomberS.png" alt="Logo Tomber Sur" class="logo-img-mini">
+        </a>
         <div class="menu-icons">
             <a href="{{ url_for('feed') }}" class="menu-icon house" title="Descubrir proyectos"></a>
             <a href="{{ url_for('my_projects') }}" class="menu-icon layers" title="Mis proyectos"></a>
@@ -54,12 +58,27 @@
         </label>
     </div>
 
-    <div class="card-container">
-        <div class="project-card" id="project-card">
-            <div class="card-title-row">
-                <h2 class="card-title">Selecciona un proyecto</h2>
+    <main class="my-projects-layout" role="main">
+        <section class="view-intro hero-block collapsible collapsed" aria-labelledby="member-hero-heading">
+            <span class="hero-eyebrow">Miembros</span>
+            <h1 id="member-hero-heading">Proyectos de los que sos miembro</h1>
+            <p class="hero-description">Deslizá para navegar. Desplazá hacia arriba para ver los detalles.</p>
+            <button type="button" class="hero-toggle" title="Expandir/Minimizar" aria-label="Expandir o minimizar">▾</button>
+
+            <div class="hero-summary" aria-label="Resumen de membresía">
+                <div class="hero-summary__item">
+                    <span class="hero-summary__label">Miembro de</span>
+                    <span class="hero-summary__value" id="member-projects-count">0</span>
+                </div>
             </div>
-            <div class="card-image"></div>
+        </section>
+
+        <div class="card-container">
+            <div class="project-card" id="project-card">
+                <div class="card-title-row">
+                    <h2 class="card-title">Selecciona un proyecto</h2>
+                </div>
+                <div class="card-image"></div>
             <div class="card-stats">
                 <span><span class="fluent--people-team-16-filled iconos"></span><span class="stats-text">00/00</span></span>
                 <span><span class="tabler--clock iconos"></span><span class="stats-text">Sin definir</span></span>
@@ -81,7 +100,7 @@
                 </svg>
             </div>
         </div>
-    </div>
+    </main>
 
     <div class="status-indicators" id="status-indicators">
         <div class="dislike-indicator">Anterior</div>
@@ -185,5 +204,20 @@
     <script src="/static/scripts/uiCommon.js"></script>
     <script src="/static/scripts/script.js"></script>
     <script src="/static/scripts/projects.js"></script>
+    <script>
+        // Actualiza el total de proyectos donde el usuario es miembro
+        document.addEventListener('DOMContentLoaded', () => {
+            const el = document.getElementById('member-projects-count');
+            if (!el) return;
+            const update = () => {
+                const mgr = window.projectsManager;
+                if (!mgr) return;
+                const count = Array.isArray(mgr.projects) ? mgr.projects.length : 0;
+                el.textContent = count;
+            };
+            update();
+            setInterval(update, 1500);
+        });
+    </script>
 </body>
 </html>
