@@ -365,6 +365,104 @@
             gap: 1px;
         }
 
+
+/* --- INICIO: Cambios para Calificación de Miembros --- */
+
+/* Hace que los miembros en la lista de la tarjeta expandida
+   sean cliqueables cuando corresponde */
+.members-list .member-item.ratable-member {
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.members-list .member-item.ratable-member:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-1px);
+}
+
+/* Estilos para el modal de calificación */
+.rating-user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+.rating-user-info .member-avatar {
+    width: 45px;
+    height: 45px;
+}
+
+.rating-user-info .member-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+/* Estilos para el input de estrellas */
+.star-rating-input {
+    display: flex;
+    gap: 4px;
+    padding: 8px 0;
+}
+
+.star-rating-input .star {
+    font-size: 2.2rem;
+    color: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    transition: color 0.2s ease, transform 0.1s ease;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+.star-rating-input .star:hover {
+    color: rgba(255, 215, 0, 0.7);
+}
+
+.star-rating-input .star.selected,
+.star-rating-input:hover .star:hover,
+.star-rating-input .star.selected ~ .star,
+.star-rating-input:hover .star:hover ~ .star {
+    color: rgba(255, 215, 0, 0.7);
+}
+
+/* Efecto hover: ilumina esta estrella y las anteriores */
+.star-rating-input:hover .star:hover {
+    color: #ffd700 !important;
+    transform: scale(1.1);
+}
+
+.star-rating-input .star.selected {
+    color: #ffd700;
+}
+
+/* Hack para iluminar estrellas anteriores al hacer hover */
+.star-rating-input:hover .star[data-value="1"]:hover ~ .star { color: rgba(255, 215, 0, 0.7); }
+.star-rating-input:hover .star[data-value="2"]:hover ~ .star { color: rgba(255, 215, 0, 0.7); }
+.star-rating-input:hover .star[data-value="3"]:hover ~ .star { color: rgba(255, 215, 0, 0.7); }
+.star-rating-input:hover .star[data-value="4"]:hover ~ .star { color: rgba(255, 215, 0, 0.7); }
+
+.star-rating-input:hover .star[data-value="1"]:hover,
+.star-rating-input:hover .star[data-value="2"]:hover,
+.star-rating-input:hover .star[data-value="3"]:hover,
+.star-rating-input:hover .star[data-value="4"]:hover,
+.star-rating-input:hover .star[data-value="5"]:hover {
+    color: #ffd700 !important;
+}
+
+.star-rating-input:hover .star[data-value="1"]:hover ~ .star[data-value="1"],
+.star-rating-input:hover .star[data-value="2"]:hover ~ .star[data-value="2"],
+.star-rating-input:hover .star[data-value="3"]:hover ~ .star[data-value="3"],
+.star-rating-input:hover .star[data-value="4"]:hover ~ .star[data-value="4"]
+{
+    color: #ffd700 !important;
+}
+
+/* --- FIN: Cambios para Calificación de Miembros --- */
+
+
 .star-rating-expanded {
     display: flex;
     justify-content: flex-start; /* Align to left */

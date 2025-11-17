@@ -517,6 +517,7 @@ class ProjectsManager {
 
         container.innerHTML = '';
         const normalizedMembers = Array.isArray(members) ? members : [];
+        const project = this.getCurrentProject();
 
         if (normalizedMembers.length === 0) {
             const emptyState = document.createElement('div');
@@ -544,10 +545,43 @@ class ProjectsManager {
             const info = document.createElement('div');
             info.className = 'member-info';
 
+            const nameContainer = document.createElement('div');
+            nameContainer.style.display = 'flex';
+            nameContainer.style.alignItems = 'center';
+            nameContainer.style.gap = '8px';
+
             const name = document.createElement('span');
             name.className = 'member-name';
             name.textContent = member.name || 'Integrante sin nombre';
-            info.appendChild(name);
+            nameContainer.appendChild(name);
+
+            // Add rate button if current user is creator and not rating themselves
+            if (project && this.currentUserId === project.creatorId && member.id !== this.currentUserId) {
+                const rateButton = document.createElement('button');
+                rateButton.className = 'rate-member-btn';
+                rateButton.textContent = '⭐';
+                rateButton.title = 'Calificar miembro';
+                rateButton.style.cssText = `
+                    background: none;
+                    border: none;
+                    cursor: pointer;
+                    font-size: 16px;
+                    color: #363F72;
+                    padding: 2px;
+                    border-radius: 4px;
+                    transition: background-color 0.2s;
+                `;
+                rateButton.addEventListener('mouseover', () => {
+                    rateButton.style.backgroundColor = '#f0f0f0';
+                });
+                rateButton.addEventListener('mouseout', () => {
+                    rateButton.style.backgroundColor = 'transparent';
+                });
+                rateButton.addEventListener('click', () => this.showRatingModal(member, project));
+                nameContainer.appendChild(rateButton);
+            }
+
+            info.appendChild(nameContainer);
 
             if (member.email) {
                 const meta = document.createElement('span');
@@ -566,6 +600,400 @@ class ProjectsManager {
             item.appendChild(avatar);
             item.appendChild(info);
             container.appendChild(item);
+        });
+    }
+
+    showRatingModal(member, project) {
+        // Create overlay
+        const overlay = document.createElement('div');
+        overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            animation: fadeIn 0.2s ease-out;
+        `;
+
+        // Create modal
+        const modal = document.createElement('div');
+        modal.style.cssText = `
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 0 8px 32px rgba(54, 63, 114, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            animation: slideIn 0.3s ease-out;
+            position: relative;
+        `;
+
+        // Close button
+        const closeButton = document.createElement('button');
+        closeButton.innerHTML = '×';
+        closeButton.style.cssText = `
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        `;
+        closeButton.addEventListener('mouseover', () => {
+            closeButton.style.backgroundColor = '#f0f0f0';
+            closeButton.style.color = '#363F72';
+        });
+        closeButton.addEventListener('mouseout', () => {
+            closeButton.style.backgroundColor = 'transparent';
+            closeButton.style.color = '#666';
+        });
+        closeButton.addEventListener('click', () => overlay.remove());
+
+        // Header
+        const header = document.createElement('div');
+        header.style.cssText = `
+            text-align: center;
+            margin-bottom: 24px;
+        `;
+
+        const title = document.createElement('h3');
+        title.textContent = `Calificar Miembro`;
+        title.style.cssText = `
+            margin: 0 0 8px 0;
+            color: #363F72;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        `;
+
+        const subtitle = document.createElement('p');
+        subtitle.textContent = member.name;
+        subtitle.style.cssText = `
+            margin: 0;
+            color: #666;
+            font-size: 14px;
+            font-weight: 500;
+        `;
+
+        // Rating section
+        const ratingSection = document.createElement('div');
+        ratingSection.style.cssText = `
+            margin-bottom: 24px;
+            text-align: center;
+        `;
+
+        const ratingLabel = document.createElement('label');
+        ratingLabel.textContent = '¿Cómo calificarías su contribución?';
+        ratingLabel.style.cssText = `
+            display: block;
+            margin-bottom: 16px;
+            font-weight: 600;
+            color: #363F72;
+            font-size: 16px;
+        `;
+
+        const starsContainer = document.createElement('div');
+        starsContainer.style.cssText = `
+            display: flex;
+            gap: 4px;
+            justify-content: center;
+            margin-bottom: 12px;
+        `;
+
+        let selectedRating = 0;
+        const stars = [];
+
+        for (let i = 1; i <= 5; i++) {
+            const starWrapper = document.createElement('div');
+            starWrapper.style.cssText = `
+                position: relative;
+                cursor: pointer;
+                transition: transform 0.2s ease;
+            `;
+
+            const star = document.createElement('span');
+            star.textContent = '★';
+            star.style.cssText = `
+                font-size: 32px;
+                color: #e0e0e0;
+                transition: all 0.3s ease;
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            `;
+
+            starWrapper.addEventListener('click', () => {
+                selectedRating = i;
+                stars.forEach((s, index) => {
+                    const starElement = s.querySelector('span');
+                    if (index < i) {
+                        starElement.style.color = '#363F72';
+                        starElement.style.transform = 'scale(1.1)';
+                        starElement.style.filter = 'drop-shadow(0 0 8px rgba(54, 63, 114, 0.3))';
+                    } else {
+                        starElement.style.color = '#e0e0e0';
+                        starElement.style.transform = 'scale(1)';
+                        starElement.style.filter = 'none';
+                    }
+                });
+            });
+
+            starWrapper.addEventListener('mouseover', () => {
+                stars.forEach((s, index) => {
+                    const starElement = s.querySelector('span');
+                    if (index < i) {
+                        starElement.style.color = '#363F72';
+                        starElement.style.transform = 'scale(1.1)';
+                        starElement.style.filter = 'drop-shadow(0 0 8px rgba(54, 63, 114, 0.3))';
+                    } else {
+                        starElement.style.color = '#e0e0e0';
+                        starElement.style.transform = 'scale(1)';
+                        starElement.style.filter = 'none';
+                    }
+                });
+            });
+
+            starWrapper.addEventListener('mouseout', () => {
+                stars.forEach((s, index) => {
+                    const starElement = s.querySelector('span');
+                    if (index < selectedRating) {
+                        starElement.style.color = '#363F72';
+                        starElement.style.transform = 'scale(1.1)';
+                        starElement.style.filter = 'drop-shadow(0 0 8px rgba(54, 63, 114, 0.3))';
+                    } else {
+                        starElement.style.color = '#e0e0e0';
+                        starElement.style.transform = 'scale(1)';
+                        starElement.style.filter = 'none';
+                    }
+                });
+            });
+
+            starWrapper.appendChild(star);
+            stars.push(starWrapper);
+            starsContainer.appendChild(starWrapper);
+        }
+
+        const ratingText = document.createElement('div');
+        ratingText.style.cssText = `
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+            min-height: 20px;
+        `;
+
+        // Comment section
+        const commentSection = document.createElement('div');
+        commentSection.style.cssText = `
+            margin-bottom: 32px;
+        `;
+
+        const commentLabel = document.createElement('label');
+        commentLabel.textContent = 'Comentario (opcional)';
+        commentLabel.style.cssText = `
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #363F72;
+            font-size: 14px;
+        `;
+
+        const commentTextarea = document.createElement('textarea');
+        commentTextarea.placeholder = 'Comparte detalles sobre su trabajo, actitud o contribución al proyecto...';
+        commentTextarea.style.cssText = `
+            width: 100%;
+            min-height: 100px;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            resize: vertical;
+            font-family: inherit;
+            font-size: 14px;
+            line-height: 1.5;
+            transition: border-color 0.2s ease;
+            background: #fafbfc;
+        `;
+        commentTextarea.addEventListener('focus', () => {
+            commentTextarea.style.borderColor = '#363F72';
+            commentTextarea.style.background = '#ffffff';
+        });
+        commentTextarea.addEventListener('blur', () => {
+            commentTextarea.style.borderColor = '#e1e5e9';
+            commentTextarea.style.background = '#fafbfc';
+        });
+
+        // Buttons
+        const buttonsContainer = document.createElement('div');
+        buttonsContainer.style.cssText = `
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        `;
+
+        const cancelButton = document.createElement('button');
+        cancelButton.textContent = 'Cancelar';
+        cancelButton.style.cssText = `
+            padding: 12px 24px;
+            border: 2px solid #e1e5e9;
+            background: #ffffff;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            color: #666;
+            transition: all 0.2s ease;
+        `;
+        cancelButton.addEventListener('mouseover', () => {
+            cancelButton.style.borderColor = '#363F72';
+            cancelButton.style.color = '#363F72';
+        });
+        cancelButton.addEventListener('mouseout', () => {
+            cancelButton.style.borderColor = '#e1e5e9';
+            cancelButton.style.color = '#666';
+        });
+        cancelButton.addEventListener('click', () => overlay.remove());
+
+        const submitButton = document.createElement('button');
+        submitButton.textContent = 'Enviar Calificación';
+        submitButton.style.cssText = `
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #363F72 0%, #4a5a8a 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(54, 63, 114, 0.3);
+        `;
+        submitButton.addEventListener('mouseover', () => {
+            submitButton.style.transform = 'translateY(-1px)';
+            submitButton.style.boxShadow = '0 6px 16px rgba(54, 63, 114, 0.4)';
+        });
+        submitButton.addEventListener('mouseout', () => {
+            submitButton.style.transform = 'translateY(0)';
+            submitButton.style.boxShadow = '0 4px 12px rgba(54, 63, 114, 0.3)';
+        });
+        submitButton.addEventListener('click', async () => {
+            if (selectedRating === 0) {
+                ratingText.textContent = 'Por favor selecciona una calificación';
+                ratingText.style.color = '#e74c3c';
+                return;
+            }
+
+            submitButton.disabled = true;
+            submitButton.textContent = 'Enviando...';
+            submitButton.style.opacity = '0.7';
+
+            try {
+                await window.apiClient.post('/api/user-ratings', {
+                    ratedUserId: member.id,
+                    rating: selectedRating,
+                    comment: commentTextarea.value.trim() || null,
+                    projectId: project.id,
+                });
+
+                // Show success message
+                if (typeof window.showToastMessage === 'function') {
+                    window.showToastMessage('¡Calificación enviada correctamente!', 'exito');
+                } else {
+                    alert('¡Calificación enviada correctamente!');
+                }
+
+                overlay.remove();
+
+                // Refresh project data to update ratings
+                await this.loadProjects();
+                this.renderCurrentProject();
+
+            } catch (error) {
+                console.error('Error al enviar calificación:', error);
+                submitButton.disabled = false;
+                submitButton.textContent = 'Enviar Calificación';
+                submitButton.style.opacity = '1';
+
+                const message = error?.message || 'No se pudo enviar la calificación.';
+                if (typeof window.showToastMessage === 'function') {
+                    window.showToastMessage(message, 'error');
+                } else {
+                    alert(message);
+                }
+            }
+        });
+
+        // Update rating text based on selection
+        const updateRatingText = () => {
+            const texts = ['', 'Muy malo', 'Malo', 'Regular', 'Bueno', 'Excelente'];
+            ratingText.textContent = selectedRating > 0 ? texts[selectedRating] : '';
+            ratingText.style.color = selectedRating > 0 ? '#363F72' : '#666';
+        };
+
+        stars.forEach((starWrapper, index) => {
+            starWrapper.addEventListener('click', updateRatingText);
+        });
+
+        // Assemble modal
+        header.appendChild(title);
+        header.appendChild(subtitle);
+
+        ratingSection.appendChild(ratingLabel);
+        ratingSection.appendChild(starsContainer);
+        ratingSection.appendChild(ratingText);
+
+        commentSection.appendChild(commentLabel);
+        commentSection.appendChild(commentTextarea);
+
+        buttonsContainer.appendChild(cancelButton);
+        buttonsContainer.appendChild(submitButton);
+
+        modal.appendChild(closeButton);
+        modal.appendChild(header);
+        modal.appendChild(ratingSection);
+        modal.appendChild(commentSection);
+        modal.appendChild(buttonsContainer);
+
+        overlay.appendChild(modal);
+        document.body.appendChild(overlay);
+
+        // Add CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+            @keyframes slideIn {
+                from {
+                    opacity: 0;
+                    transform: scale(0.9) translateY(-20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: scale(1) translateY(0);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Close on overlay click
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+                overlay.remove();
+            }
         });
     }
 

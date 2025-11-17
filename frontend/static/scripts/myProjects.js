@@ -1,6 +1,3 @@
-// Script especifico para la vista de "Mis proyectos".
-// Define un ProjectsManager personalizado con acciones de edicion y gestion de interesados.
-
 (() => {
     const clampProgress = (value) => {
         if (value === null || value === undefined || value === '') {
@@ -103,6 +100,7 @@
                 this.pendingBannerFile = null;
                 this.interestedCounts = new Map();
                 this.bindOwnerElements();
+                this.bindRatingElements(); // <-- Añadido
             }
 
             bindOwnerElements() {
@@ -166,6 +164,159 @@
                 });
             }
 
+            // --- Inicio: Nuevos métodos para calificación ---
+
+            bindRatingElements() {
+                this.ratingModal = document.getElementById('rating-modal');
+                this.closeRatingModalBtn = document.getElementById('close-rating-modal');
+                this.cancelRatingBtn = document.getElementById('cancel-rating');
+                this.ratingForm = document.getElementById('rating-form');
+                this.ratingUserName = document.getElementById('rating-user-name');
+                this.ratingUserAvatar = document.getElementById('rating-user-avatar');
+                this.starRatingInputContainer = document.getElementById('star-rating-input');
+                this.ratingValueInput = document.getElementById('rating-value-input');
+                this.ratingComment = document.getElementById('rating-comment');
+                this.ratingStars = this.starRatingInputContainer?.querySelectorAll('.star');
+
+                this.closeRatingModalBtn?.addEventListener('click', () => this.closeRatingModal());
+                this.cancelRatingBtn?.addEventListener('click', () => this.closeRatingModal());
+                this.ratingForm?.addEventListener('submit', (e) => this.handleRatingSubmit(e));
+
+                this.ratingStars?.forEach((star) => {
+                    star.addEventListener('click', () => {
+                        const value = star.dataset.value;
+                        this.setStarRating(value);
+                    });
+                });
+
+                window.addEventListener('keydown', (event) => {
+                    if (event.key === 'Escape' && this.ratingModal && this.ratingModal.classList.contains('visible')) {
+                        this.closeRatingModal();
+                    }
+                });
+            }
+
+            setStarRating(value) {
+                const rating = parseInt(value, 10) || 0;
+                this.ratingValueInput.value = rating;
+                this.starRatingInputContainer.dataset.rating = rating;
+                this.ratingStars.forEach((star) => {
+                    if (parseInt(star.dataset.value, 10) <= rating) {
+                        star.classList.add('selected');
+                    } else {
+                        star.classList.remove('selected');
+                    }
+                });
+            }
+
+            openRatingModal(member, projectId) {
+                if (!member || !projectId || !this.ratingModal) {
+                    return;
+                }
+                this.ratingModal.dataset.projectId = projectId;
+                this.ratingModal.dataset.ratedUserId = member.id;
+                this.ratingUserName.textContent = member.name || 'Miembro';
+                this.ratingUserAvatar.src = member.avatarSrc || '/static/imagenes/profile-placeholder.svg';
+
+                this.setStarRating(0);
+                this.ratingComment.value = '';
+
+                this.ratingModal.classList.remove('hidden');
+                requestAnimationFrame(() => this.ratingModal?.classList.add('visible'));
+            }
+
+            closeRatingModal() {
+                if (!this.ratingModal) {
+                    return;
+                }
+                this.ratingModal.classList.remove('visible');
+                setTimeout(() => {
+                    this.ratingModal?.classList.add('hidden');
+                    this.ratingForm?.reset();
+                    delete this.ratingModal.dataset.projectId;
+                    delete this.ratingModal.dataset.ratedUserId;
+                }, 220);
+            }
+
+            async handleRatingSubmit(event) {
+                event.preventDefault();
+                const projectId = this.ratingModal.dataset.projectId;
+                const ratedUserId = this.ratingModal.dataset.ratedUserId;
+                const rating = parseInt(this.ratingValueInput.value, 10);
+                const comment = this.ratingComment.value.trim();
+
+                if (!projectId || !ratedUserId) {
+                    TOAST('Error: No se pudo identificar al usuario o proyecto.', 'error');
+                    return;
+                }
+                if (rating < 1 || rating > 5) {
+                    TOAST('Por favor, selecciona una calificación de 1 a 5 estrellas.', 'aviso');
+                    return;
+                }
+
+                const payload = {
+                    ratedUserId: Number(ratedUserId),
+                    rating,
+                    comment: comment || null,
+                    projectId: Number(projectId),
+                };
+
+                try {
+                    await window.apiClient.post('/api/user-ratings', payload);
+                    TOAST('Calificación enviada con éxito.', 'exito');
+                    this.closeRatingModal();
+                    // Opcional: Actualizar la UI si es necesario, aunque el rating
+                    // promedio se ve en el perfil, no aquí.
+                } catch (error) {
+                    const message =
+                        error?.data?.message ||
+                        error?.data?.detail ||
+                        error?.message ||
+                        'No se pudo enviar la calificación.';
+                    TOAST(message, 'error');
+                }
+            }
+
+            makeMembersRatable(project) {
+                const membersListContainer = this.expandedCard?.querySelector('.members-list');
+                if (!membersListContainer || !project?.id) {
+                    return;
+                }
+                const currentUserId = window.apiClient.auth.getUser()?.id;
+                if (!currentUserId) {
+                    return;
+                }
+
+                const memberItems = membersListContainer.querySelectorAll('.member-item');
+                memberItems.forEach((item) => {
+                    const memberId = item.dataset.userId;
+                    if (!memberId) {
+                        return;
+                    }
+                    
+                    // Solo se puede calificar a otros miembros, no al creador (uno mismo)
+                    if (Number(memberId) !== currentUserId) {
+                        item.classList.add('ratable-member');
+                        item.title = 'Calificar a este miembro';
+
+                        const memberName = item.querySelector('.member-name')?.textContent || 'Miembro';
+                        const memberAvatarSrc = item.querySelector('.member-avatar img')?.src;
+                        
+                        // Evitar doble listener
+                        if (!item.dataset.ratingListener) {
+                            item.addEventListener('click', (e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                this.openRatingModal({ id: memberId, name: memberName, avatarSrc }, project.id);
+                            });
+                            item.dataset.ratingListener = 'true';
+                        }
+                    }
+                });
+            }
+
+            // --- Fin: Nuevos métodos para calificación ---
+
             updateProjectCard(project) {
                 super.updateProjectCard(project);
                 this.updateOwnerButtons(project);
@@ -175,6 +326,7 @@
                 super.updateExpandedCard(project);
                 this.alignExpandedMarkupToFeed();
                 this.updateOwnerButtons(project);
+                this.makeMembersRatable(project); // <-- Añadido
             }
 
             alignExpandedMarkupToFeed() {

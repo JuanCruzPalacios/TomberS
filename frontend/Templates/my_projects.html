@@ -291,6 +291,42 @@
         </div>
     </div>
 
+    <div class="project-edit-modal hidden" id="rating-modal">
+        <div class="project-edit-dialog" style="max-width: 500px;">
+            <button class="close-edit" id="close-rating-modal">&times;</button>
+            <h2>Calificar Miembro</h2>
+            <p class="edit-subtitle">Otorga una calificación y un comentario sobre el desempeño del miembro en este proyecto.</p>
+
+            <form id="rating-form">
+                <div class="rating-user-info">
+                    <img id="rating-user-avatar" src="/static/imagenes/profile-placeholder.svg" alt="Avatar" class="member-avatar">
+                    <span id="rating-user-name" class="member-name">Nombre del Miembro</span>
+                </div>
+
+                <div class="form-field">
+                    <span class="form-label">Calificación (1 a 5 estrellas)</span>
+                    <div class="star-rating-input" id="star-rating-input" data-rating="0">
+                        <span class="star" data-value="1">★</span>
+                        <span class="star" data-value="2">★</span>
+                        <span class="star" data-value="3">★</span>
+                        <span class="star" data-value="4">★</span>
+                        <span class="star" data-value="5">★</span>
+                    </div>
+                    <input type="hidden" id="rating-value-input" value="0">
+                </div>
+
+                <label class="form-field full-width">
+                    <span class="form-label">Comentario (Opcional)</span>
+                    <textarea id="rating-comment" rows="3" placeholder="Escribe una breve reseña..."></textarea>
+                </label>
+
+                <div class="form-actions">
+                    <button type="button" class="ghost-button" id="cancel-rating">Cancelar</button>
+                    <button type="submit" class="primary-button">Enviar Calificación</button>
+                </div>
+            </form>
+        </div>
+    </div>
     <script src="/static/scripts/apiClient.js"></script>
     <script src="/static/scripts/uiCommon.js"></script>
     <script src="/static/scripts/myProjects.js"></script>
