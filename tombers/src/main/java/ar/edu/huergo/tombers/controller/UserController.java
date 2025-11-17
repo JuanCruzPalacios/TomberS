@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,8 +23,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Controlador REST para la gestión de usuarios.
- * Proporciona endpoints para obtener y actualizar perfiles, búsqueda y creación de perfiles.
+ * Controlador REST para la gestión de usuarios. Proporciona endpoints para
+ * obtener y actualizar perfiles, búsqueda y creación de perfiles.
  */
 @RestController
 @RequestMapping("/api/users")
@@ -35,6 +36,7 @@ public class UserController {
 
     /**
      * Obtiene el perfil del usuario autenticado.
+     *
      * @param authentication Información de autenticación del usuario.
      * @return Perfil del usuario en la respuesta HTTP.
      */
@@ -52,8 +54,9 @@ public class UserController {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
-        /**
+    /**
      * Actualiza el perfil del usuario autenticado.
+     *
      * @param authentication Informacion de autenticacion del usuario.
      * @param request Datos para actualizar el perfil.
      * @param profilePicture Archivo opcional con la nueva fotografia de perfil.
@@ -69,11 +72,10 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-
-
     /**
-     * Crea un perfil de usuario y le asigna un rol.
-     * Solo accesible por administradores.
+     * Crea un perfil de usuario y le asigna un rol. Solo accesible por
+     * administradores.
+     *
      * @param request Datos para crear el perfil.
      * @return Perfil creado en la respuesta HTTP.
      */
@@ -81,6 +83,18 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<UserResponse> createProfile(@Valid @RequestBody CreateProfileRequest request) {
         UserResponse response = userService.createProfile(request.getEmail(), request.getUsername(), request.getRole());
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Obtiene el perfil de un usuario por su ID.
+     *
+     * @param userId ID del usuario.
+     * @return Perfil del usuario en la respuesta HTTP.
+     */
+    @GetMapping("/{userId}/profile")
+    public ResponseEntity<UserResponse> getUserProfileById(@PathVariable Long userId) {
+        UserResponse response = userService.getUserProfileById(userId);
         return ResponseEntity.ok(response);
     }
 }

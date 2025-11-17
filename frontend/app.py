@@ -43,5 +43,11 @@ def project_interested(project_id: int):
     return render_template("interested.html", project_id=project_id, project_title=project_title)
 
 
+@app.route("/profile/<int:user_id>")
+def user_profile(user_id: int):
+    """Renderiza la vista de perfil de un usuario específico."""
+    return render_template("profile.html", user_id=user_id)
+
+
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)

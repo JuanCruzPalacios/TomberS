@@ -55,7 +55,7 @@ public class UserService {
         return response;
     }
 
-        /**
+    /**
      * Actualiza el perfil de un usuario con la informacion proporcionada.
      *
      * @param email el email del usuario
@@ -85,8 +85,6 @@ public class UserService {
         return toDtoWithRating(updatedUser);
     }
 
-
-
     /**
      * Crea un perfil de usuario y le asigna un rol.
      *
@@ -94,7 +92,8 @@ public class UserService {
      * @param username el nombre de usuario
      * @param role el rol a asignar
      * @return un objeto UserResponse que representa el perfil creado
-     * @throws IllegalArgumentException si el usuario ya existe o el rol es inválido
+     * @throws IllegalArgumentException si el usuario ya existe o el rol es
+     * inválido
      */
     public UserResponse createProfile(String email, String username, String role) {
         if (userRepository.existsByEmail(email)) {
@@ -118,5 +117,18 @@ public class UserService {
 
         User savedUser = userRepository.save(newUser);
         return toDtoWithRating(savedUser);
+    }
+
+    /**
+     * Obtiene el perfil de un usuario por su ID.
+     *
+     * @param userId el ID del usuario
+     * @return un objeto UserResponse que representa el perfil del usuario
+     * @throws EntityNotFoundException si el usuario no existe
+     */
+    public UserResponse getUserProfileById(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado: " + userId));
+        return toDtoWithRating(user);
     }
 }

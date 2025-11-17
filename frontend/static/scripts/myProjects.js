@@ -100,7 +100,7 @@
                 this.pendingBannerFile = null;
                 this.interestedCounts = new Map();
                 this.bindOwnerElements();
-                this.bindRatingElements(); // <-- Añadido
+                this.bindRatingElements();
             }
 
             bindOwnerElements() {
@@ -164,6 +164,129 @@
                 });
             }
 
+            renderMembersList(container, members) {
+                if (!container) {
+                    return;
+                }
+
+                container.innerHTML = '';
+                const normalizedMembers = Array.isArray(members) ? members : [];
+                const project = this.getCurrentProject();
+
+                if (normalizedMembers.length === 0) {
+                    const emptyState = document.createElement('div');
+                    emptyState.className = 'members-empty';
+                    emptyState.textContent = 'Aún no hay integrantes confirmados.';
+                    container.appendChild(emptyState);
+                    return;
+                }
+
+                normalizedMembers.forEach((member) => {
+                    const item = document.createElement('div');
+                    item.className = 'member-item';
+                    item.dataset.userId = member.userId || member.id;
+
+                    const avatar = document.createElement('div');
+                    avatar.className = 'member-avatar';
+                    if (member.avatar) {
+                        const img = document.createElement('img');
+                        img.src = member.avatar;
+                        img.alt = member.name || 'Integrante';
+                        avatar.appendChild(img);
+                    } else {
+                        avatar.textContent = this.getInitials(member.name);
+                    }
+
+                    const info = document.createElement('div');
+                    info.className = 'member-info';
+
+                    const nameContainer = document.createElement('div');
+                    nameContainer.style.display = 'flex';
+                    nameContainer.style.alignItems = 'center';
+                    nameContainer.style.gap = '8px';
+
+                    const name = document.createElement('span');
+                    name.className = 'member-name';
+                    name.textContent = member.name || 'Integrante sin nombre';
+                    nameContainer.appendChild(name);
+
+                    // Add profile view button for all members (except current user)
+                    const memberUserId = member.userId || member.id;
+                    if (memberUserId !== this.currentUserId) {
+                        const profileButton = document.createElement('button');
+                        profileButton.className = 'view-profile-btn';
+                        profileButton.innerHTML = '👤';
+                        profileButton.title = 'Ver perfil';
+                        profileButton.style.cssText = `
+                            background: none;
+                            border: none;
+                            cursor: pointer;
+                            font-size: 16px;
+                            color: #363F72;
+                            padding: 2px;
+                            border-radius: 4px;
+                            transition: background-color 0.2s;
+                        `;
+                        profileButton.addEventListener('mouseover', () => {
+                            profileButton.style.backgroundColor = '#f0f0f0';
+                        });
+                        profileButton.addEventListener('mouseout', () => {
+                            profileButton.style.backgroundColor = 'transparent';
+                        });
+                        profileButton.addEventListener('click', () => {
+                            window.location.href = `/profile/${memberUserId}`;
+                        });
+                        nameContainer.appendChild(profileButton);
+                    }
+
+                    // Add rate button if current user is creator and not rating themselves
+                    if (project && this.currentUserId === project.creatorId && memberUserId !== this.currentUserId) {
+                        const rateButton = document.createElement('button');
+                        rateButton.className = 'rate-member-btn';
+                        rateButton.textContent = '⭐';
+                        rateButton.title = 'Calificar miembro';
+                        rateButton.style.cssText = `
+                            background: none;
+                            border: none;
+                            cursor: pointer;
+                            font-size: 16px;
+                            color: #363F72;
+                            padding: 2px;
+                            border-radius: 4px;
+                            transition: background-color 0.2s;
+                        `;
+                        rateButton.addEventListener('mouseover', () => {
+                            rateButton.style.backgroundColor = '#f0f0f0';
+                        });
+                        rateButton.addEventListener('mouseout', () => {
+                            rateButton.style.backgroundColor = 'transparent';
+                        });
+                        rateButton.addEventListener('click', () => this.showRatingModal(member, project));
+                        nameContainer.appendChild(rateButton);
+                    }
+
+                    info.appendChild(nameContainer);
+
+                    if (member.email) {
+                        const meta = document.createElement('span');
+                        meta.className = 'member-meta';
+                        meta.textContent = member.email;
+                        info.appendChild(meta);
+                    }
+
+                    if (member.isCreator) {
+                        const badge = document.createElement('span');
+                        badge.className = 'member-badge';
+                        badge.textContent = 'Creador';
+                        info.appendChild(badge);
+                    }
+
+                    item.appendChild(avatar);
+                    item.appendChild(info);
+                    container.appendChild(item);
+                });
+            }
+
             // --- Inicio: Nuevos métodos para calificación ---
 
             bindRatingElements() {
@@ -214,7 +337,7 @@
                     return;
                 }
                 this.ratingModal.dataset.projectId = projectId;
-                this.ratingModal.dataset.ratedUserId = member.id;
+                this.ratingModal.dataset.ratedUserId = member.userId || member.id;
                 this.ratingUserName.textContent = member.name || 'Miembro';
                 this.ratingUserAvatar.src = member.avatarSrc || '/static/imagenes/profile-placeholder.svg';
 
@@ -265,8 +388,6 @@
                     await window.apiClient.post('/api/user-ratings', payload);
                     TOAST('Calificación enviada con éxito.', 'exito');
                     this.closeRatingModal();
-                    // Opcional: Actualizar la UI si es necesario, aunque el rating
-                    // promedio se ve en el perfil, no aquí.
                 } catch (error) {
                     const message =
                         error?.data?.message ||
@@ -307,7 +428,7 @@
                             item.addEventListener('click', (e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
-                                this.openRatingModal({ id: memberId, name: memberName, avatarSrc }, project.id);
+                                this.openRatingModal({ userId: memberId, name: memberName, avatarSrc }, project.id);
                             });
                             item.dataset.ratingListener = 'true';
                         }
@@ -326,7 +447,6 @@
                 super.updateExpandedCard(project);
                 this.alignExpandedMarkupToFeed();
                 this.updateOwnerButtons(project);
-                this.makeMembersRatable(project); // <-- Añadido
             }
 
             alignExpandedMarkupToFeed() {

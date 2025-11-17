@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/styles/style.css">
+    <title>TomberS - Perfil</title>
+</head>
+<body style="justify-content: center; align-items: center;">
+    <div class="logo-container">
+        <a href="{{ url_for('feed') }}">
+            <img src="/static/imagenes/logoTomberS.png" alt="Logo Tomber Sur" class="logo-img">
+        </a>
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="menu-icons">
+            <div class="menu-icon hamburger"></div>
+            <a href="{{ url_for('feed') }}" class="menu-icon house" title="Descubrir proyectos"></a>
+            <a href="{{ url_for('my_projects') }}" class="menu-icon layers" title="Mis proyectos"></a>
+            <a href="{{ url_for('member_projects') }}" class="menu-icon team" title="Proyectos miembro"></a>
+            <a href="{{ url_for('bio') }}" class="menu-icon user" title="Mi perfil"></a>
+        </div>
+        <label class="toggle-switch">
+            <input type="checkbox" id="theme-toggle">
+            <span class="slider"></span>
+        </label>
+    </div>
+    <div class="sidebar-trigger" id="sidebar-trigger"></div>
+
+    <div class="mobile-header" id="mobile-header">
+        <a href="{{ url_for('feed') }}">
+            <img src="/static/imagenes/logoTomberS.png" alt="Logo Tomber Sur" class="logo-img-mini">
+        </a>
+        <div class="menu-icons">
+            <a href="{{ url_for('feed') }}" class="menu-icon house" title="Descubrir proyectos"></a>
+            <a href="{{ url_for('my_projects') }}" class="menu-icon layers" title="Mis proyectos"></a>
+            <a href="{{ url_for('member_projects') }}" class="menu-icon team" title="Proyectos miembro"></a>
+            <a href="{{ url_for('bio') }}" class="menu-icon user" title="Mi perfil"></a>
+        </div>
+        <label class="toggle-switch">
+            <input type="checkbox" id="theme-togglemo">
+            <span class="slider"></span>
+        </label>
+    </div>
+
+    <div class="card-container">
+        <div class="project-card" id="project-card">
+            <div class="card-title-row">
+                <img src="/static/imagenes/logoTomberS.png" alt="Logo Tomber Sur" class="logo-img-mini">
+                <h2 class="card-title">Nombre y apellido</h2>
+                <div class="status-circle"></div>
+            </div>
+            <div class="user-card-image" title="Imagen de perfil"></div>
+            <div class="card-stats">
+                <span><span class="fluent--people-team-16-filled iconos"></span><span class="stats-text">Edad</span></span>
+                <span class="star-rating">★★★★★</span>
+                <span><span class="material-symbols--translate iconos"></span><span class="stats-text">Idiomas</span></span>
+                <span><span class="mdi--tools iconos"></span><span class="stats-text">Especialidad</span></span>
+            </div>
+            <div class="card-description">
+                Cargá tu biografía para que otros equipos conozcan tu experiencia, intereses y la motivación que te mueve a colaborar.
+            </div>
+            <div class="card-tech">
+                <div class="tech-icon">Py</div>
+                <div class="tech-icon">HTML</div>
+                <div class="tech-icon">CSS</div>
+                <div class="tech-icon">JS</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="expanded-card hidden" id="expanded-card">
+        <button class="close-expanded" id="close-expanded">&times;</button>
+        <div class="expanded-content">
+            <div class="expanded-header">
+                <div class="title-with-circle">
+                    <h2 class="expanded-title">Nombre y apellido</h2>
+                    <div class="status-circle"></div>
+                </div>
+                <div class="expanded-status">
+                    <span class="status-badge active">Disponible</span>
+                </div>
+            </div>
+
+            <div class="expanded-main">
+                <div class="expanded-left">
+                    <div class="user-card-image" title="Imagen de perfil">
+                        <div class="image-overlay">
+                            <span class="view-badge">Perfil</span>
+                        </div>
+                    </div>
+
+                    <div class="expanded-stats-grid">
+                        <div class="stat-item">
+                            <span class="fluent--people-team-16-filled"></span>
+                            <div class="stat-content">
+                                <span class="stat-label">Edad</span>
+                                <span class="stat-value">--</span>
+                            </div>
+                        </div>
+                        <div class="stat-item star-rating-expanded">
+                            <span class="star-rating" id="average-rating">★★★★★</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="material-symbols--translate"></span>
+                            <div class="stat-content">
+                                <span class="stat-label">Idiomas</span>
+                                <span class="stat-value">--</span>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <span class="mdi--tools"></span>
+                            <div class="stat-content">
+                                <span class="stat-label">Especialidad</span>
+                                <span class="stat-value">--</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="expanded-progress">
+                        <div class="progress-label">Participación en proyectos</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%"></div>
+                        </div>
+                        <span class="progress-text">Actualizá tu perfil para comenzar</span>
+                    </div>
+
+                    <div class="contact-section">
+                        <div class="contact-label">Información de contacto</div>
+                        <div class="contact-grid"></div>
+                    </div>
+                </div>
+
+                <div class="expanded-right">
+                    <div class="section">
+                        <h3 class="section-title">Sobre mí</h3>
+                        <p class="section-content">
+                            Contá quién sos, qué te entusiasma y qué tipo de proyectos buscás. Este espacio es ideal para mostrar tu personalidad y objetivos.
+                        </p>
+                    </div>
+
+                    <div class="section">
+                        <h3 class="section-title">Habilidades Técnicas</h3>
+                        <div class="tech-grid"></div>
+                    </div>
+
+                    <div class="section">
+                        <h3 class="section-title">Certificaciones y Cursos</h3>
+                        <div class="objectives-list"></div>
+                    </div>
+
+                    <div class="section">
+                        <h3 class="section-title">Áreas de interés</h3>
+                        <div class="skills-grid"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/scripts/apiClient.js"></script>
+    <script src="/static/scripts/uiCommon.js"></script>
+    <script src="/static/scripts/profileViewer.js"></script>
+</body>
+</html>
