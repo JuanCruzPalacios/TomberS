@@ -555,33 +555,7 @@ class ProjectsManager {
             name.textContent = member.name || 'Integrante sin nombre';
             nameContainer.appendChild(name);
 
-            // Add profile view button for all members (except current user)
-            if (member.id !== this.currentUserId) {
-                const profileButton = document.createElement('button');
-                profileButton.className = 'view-profile-btn';
-                profileButton.innerHTML = '👤';
-                profileButton.title = 'Ver perfil';
-                profileButton.style.cssText = `
-                    background: none;
-                    border: none;
-                    cursor: pointer;
-                    font-size: 16px;
-                    color: #363F72;
-                    padding: 2px;
-                    border-radius: 4px;
-                    transition: background-color 0.2s;
-                `;
-                profileButton.addEventListener('mouseover', () => {
-                    profileButton.style.backgroundColor = '#f0f0f0';
-                });
-                profileButton.addEventListener('mouseout', () => {
-                    profileButton.style.backgroundColor = 'transparent';
-                });
-                profileButton.addEventListener('click', () => {
-                    window.location.href = `/profile/${member.id}`;
-                });
-                nameContainer.appendChild(profileButton);
-            }
+
 
             // Add rate button if current user is creator and not rating themselves
             if (project && this.currentUserId === project.creatorId && member.id !== this.currentUserId) {
